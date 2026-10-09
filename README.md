@@ -1,1 +1,1 @@
-# 5G-NR26-Reporting
+# 5g-nr26-reporting
