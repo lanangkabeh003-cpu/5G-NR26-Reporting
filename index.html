@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cluster Report Dashboard - NR2600 Jakarta Pusat</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Alpine.js untuk Reaktivitas -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <!-- Leaflet CSS untuk Peta Interaktif -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        #map { height: 100%; min-height: 350px; border-radius: 0.75rem; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col" x-data="{ activeSlide: 1 }">
+
+    <!-- Top Navigation Bar -->
+    <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-50 px-6 py-4 flex items-center justify-between shadow-lg">
+        <div class="flex items-center space-x-4">
+            <div class="bg-white px-3 py-1.5 rounded-lg flex items-center shadow">
+                <span class="text-slate-900 font-bold text-lg tracking-wider">indosat</span>
+                <span class="text-xs text-rose-600 font-semibold ml-1">OOREDOO HUTCHISON</span>
+            </div>
+            <div>
+                <h1 class="text-base font-bold text-white">Cluster Report: JAKARTA PUSAT_01_N04_B</h1>
+                <p class="text-xs text-slate-400">September - October 2026 | 5G Cluster Activation</p>
+            </div>
+        </div>
+        <!-- Slide Navigation Switcher -->
+        <div class="flex items-center space-x-2">
+            <span class="text-xs text-slate-400 mr-2 hidden md:inline">Navigasi Slide:</span>
+            <template x-for="slide in [1, 2, 3, 4, 5]">
+                <button @click="activeSlide = slide" 
+                    :class="activeSlide === slide ? 'bg-rose-600 text-white font-bold shadow-lg shadow-rose-600/30' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'"
+                    class="w-9 h-9 rounded-lg text-xs transition flex items-center justify-center border border-slate-700"
+                    x-text="slide">
+                </button>
+            </template>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-1 p-6 max-w-7xl mx-auto w-full">
+
+        <!-- ================= SLIDE 1: EXECUTIVE SUMMARY & SITE INFO ================= -->
+        <section x-show="activeSlide === 1" class="space-y-6">
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                    <div>
+                        <span class="bg-rose-500/10 text-rose-400 text-xs font-semibold px-3 py-1 rounded-full border border-rose-500/20">Executive Summary</span>
+                        <h2 class="text-2xl font-bold mt-2 text-white">5G Cluster Activation 100% Completed</h2>
+                    </div>
+                    <div class="text-left md:text-right">
+                        <p class="text-xs text-slate-400">Last Site Activation Period</p>
+                        <p class="text-sm font-semibold text-emerald-400">17 - 25 Sep 2026 (3 Sites Total)</p>
+                    </div>
+                </div>
+
+                <!-- Metric Cards Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
+                        <p class="text-xs text-slate-400">Total Sites Status</p>
+                        <p class="text-2xl font-bold text-white mt-1">3 Sites</p>
+                        <span class="text-xs text-emerald-400 font-medium">RFC Completed (0 HN Completed)</span>
+                    </div>
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
+                        <p class="text-xs text-slate-400">Total Traffic (4G + 5G)</p>
+                        <p class="text-2xl font-bold text-emerald-400 mt-1">+16.26%</p>
+                        <span class="text-xs text-slate-400">Baseline vs After Opt.</span>
+                    </div>
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
+                        <p class="text-xs text-slate-400">5G DL User Throughput</p>
+                        <p class="text-2xl font-bold text-indigo-400 mt-1">120.39 Mbps</p>
+                        <span class="text-xs text-emerald-400 font-medium">Exceeded Target</span>
+                    </div>
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
+                        <p class="text-xs text-slate-400">5G-4G Ping Pong Ratio</p>
+                        <p class="text-2xl font-bold text-indigo-400 mt-1">3.24%</p>
+                        <span class="text-xs text-emerald-400 font-medium">Target < 8% (Pass)</span>
+                    </div>
+                </div>
+
+                <!-- Site Table Data -->
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm text-slate-300">
+                        <thead class="bg-slate-950 text-xs uppercase text-slate-400 border-b border-slate-800">
+                            <tr>
+                                <th class="p-3">DU ID</th>
+                                <th class="p-3">Site ID</th>
+                                <th class="p-3">Customer Site Name</th>
+                                <th class="p-3">Azimuth AAU</th>
+                                <th class="p-3">Cell Status</th>
+                                <th class="p-3">OneBox Link</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-800">
+                            <tr class="hover:bg-slate-800/50">
+                                <td class="p-3 font-medium text-white">12JKP0359_5G26_EXP</td>
+                                <td class="p-3">12JKP0359</td>
+                                <td class="p-3">VIP_MERDEKA_SELATAN</td>
+                                <td class="p-3">75/160/340</td>
+                                <td class="p-3"><span class="bg-emerald-500/10 text-emerald-400 px-2.5 py-1 rounded-full text-xs border border-emerald-500/20">Active</span></td>
+                                <td class="p-3"><a href="https://onebox.huawei.com/p/6b0a907ecf363f479d0f7e43fb9ed421" target="_blank" class="text-rose-400 hover:underline text-xs">Open Link &rarr;</a></td>
+                            </tr>
+                            <tr class="hover:bg-slate-800/50">
+                                <td class="p-3 font-medium text-white">12JKP0411_5G26_EXP</td>
+                                <td class="p-3">12JKP0411</td>
+                                <td class="p-3">KWINI_BL_FE</td>
+                                <td class="p-3">130/280/30</td>
+                                <td class="p-3"><span class="bg-emerald-500/10 text-emerald-400 px-2.5 py-1 rounded-full text-xs border border-emerald-500/20">Active</span></td>
+                                <td class="p-3"><a href="https://onebox.huawei.com/p/6b0a907ecf363f479d0f7e43fb9ed421" target="_blank" class="text-rose-400 hover:underline text-xs">Open Link &rarr;</a></td>
+                            </tr>
+                            <tr class="hover:bg-slate-800/50">
+                                <td class="p-3 font-medium text-white">12JKP0456_5G26_EXP</td>
+                                <td class="p-3">12JKP0456</td>
+                                <td class="p-3">KRAMAT_PULO_EP</td>
+                                <td class="p-3">90/200/300</td>
+                                <td class="p-3"><span class="bg-emerald-500/10 text-emerald-400 px-2.5 py-1 rounded-full text-xs border border-emerald-500/20">Active</span></td>
+                                <td class="p-3"><a href="https://onebox.huawei.com/p/6b0a907ecf363f479d0f7e43fb9ed421" target="_blank" class="text-rose-400 hover:underline text-xs">Open Link &rarr;</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= SLIDE 2: GIS MAP & COVERAGE ANALYSIS ================= -->
+        <section x-show="activeSlide === 2" class="space-y-6" style="display: none;" x-init="initMap()">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Interactive Leaflet Map Container -->
+                <div class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col justify-between">
+                    <div class="flex justify-between items-center mb-4">
+                        <div>
+                            <h2 class="text-xl font-bold text-white">Cluster GIS Map & Coverage Analysis</h2>
+                            <p class="text-xs text-slate-400">Wilayah Jakarta Pusat_01_N04_B</p>
+                        </div>
+                        <span class="bg-emerald-500/10 text-emerald-400 text-xs px-3 py-1 rounded-full border border-emerald-500/20">Post Optimization Active</span>
+                    </div>
+                    <div class="relative bg-slate-950 h-96 rounded-xl border border-slate-800 overflow-hidden">
+                        <div id="clusterMap" class="w-full h-full"></div>
+                    </div>
+                </div>
+
+                <!-- Legend & Statistics Box -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4 flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400 mb-3">5G RSRP Distribution (Post)</h3>
+                        <div class="space-y-2 text-xs">
+                            <div class="flex justify-between items-center bg-slate-950 p-2.5 rounded-lg border border-slate-800">
+                                <span class="flex items-center"><span class="w-3 h-3 bg-blue-600 rounded-sm mr-2"></span> -85 to -40 (Excellent)</span>
+                                <span class="font-bold text-white">77.42%</span>
+                            </div>
+                            <div class="flex justify-between items-center bg-slate-950 p-2.5 rounded-lg border border-slate-800">
+                                <span class="flex items-center"><span class="w-3 h-3 bg-green-600 rounded-sm mr-2"></span> -95 to -85 (Very Good)</span>
+                                <span class="font-bold text-white">22.58%</span>
+                            </div>
+                            <div class="flex justify-between items-center bg-slate-950 p-2.5 rounded-lg border border-slate-800">
+                                <span class="flex items-center"><span class="w-3 h-3 bg-lime-500 rounded-sm mr-2"></span> -105 to -95 (Good)</span>
+                                <span class="font-bold text-white">0.00%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
+                        <p class="text-xs text-slate-400">Key Highlight:</p>
+                        <p class="text-xs text-emerald-400 font-semibold mt-1">5G_2600 POST RSRP $\ge -105$ dBm mencapai 100%.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= SLIDE 3: 5G NMS KPI MATRIX ================= -->
+        <section x-show="activeSlide === 3" class="space-y-6" style="display: none;">
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+                <div class="mb-6">
+                    <span class="bg-indigo-500/10 text-indigo-400 text-xs font-semibold px-3 py-1 rounded-full border border-indigo-500/20">NMS Performance</span>
+                    <h2 class="text-2xl font-bold mt-2 text-white">5G NMS KPI Matrix (3 Days Comparison)</h2>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs text-slate-300">
+                        <thead class="bg-slate-950 uppercase text-slate-400 border-b border-slate-800">
+                            <tr>
+                                <th class="p-3">Category</th>
+                                <th class="p-3">KPI Name</th>
+                                <th class="p-3">Threshold</th>
+                                <th class="p-3">Before 5G_2100</th>
+                                <th class="p-3">After 5G_2600</th>
+                                <th class="p-3">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-800">
+                            <tr class="hover:bg-slate-800/50">
+                                <td class="p-3 font-semibold text-white">Accessibility</td>
+                                <td class="p-3">SgNB Addition Success Rate (BH)</td>
+                                <td class="p-3">> 98%</td>
+                                <td class="p-3">99.63%</td>
+                                <td class="p-3 font-bold text-emerald-400">99.77%</td>
+                                <td class="p-3"><span class="text-emerald-400 font-semibold">Improve</span></td>
+                            </tr>
+                            <tr class="hover:bg-slate-800/50">
+                                <td class="p-3 font-semibold text-white">Retainability</td>
+                                <td class="p-3">SCG Additional Abnormal Release</td>
+                                <td class="p-3">< 1%</td>
+                                <td class="p-3">0.08%</td>
+                                <td class="p-3 font-bold text-emerald-400">0.04%</td>
+                                <td class="p-3"><span class="text-emerald-400 font-semibold">Improve</span></td>
+                            </tr>
+                            <tr class="hover:bg-slate-800/50">
+                                <td class="p-3 font-semibold text-white">Mobility</td>
+                                <td class="p-3">Ping Pong Ratio (Daily)</td>
+                                <td class="p-3">< 8%</td>
+                                <td class="p-3">8.55%</td>
+                                <td class="p-3 font-bold text-emerald-400">3.24%</td>
+                                <td class="p-3"><span class="text-emerald-400 font-semibold">Improve</span></td>
+                            </tr>
+                            <tr class="hover:bg-slate-800/50">
+                                <td class="p-3 font-semibold text-white">Quality</td>
+                                <td class="p-3">Average CQI (Busy Hour)</td>
+                                <td class="p-3">> 8.5</td>
+                                <td class="p-3">10.69</td>
+                                <td class="p-3 font-bold text-indigo-400">11.60</td>
+                                <td class="p-3"><span class="text-indigo-400 font-semibold">Maintain</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= SLIDE 4: FIELD TEST / CET RESULTS ================= -->
+        <section x-show="activeSlide === 4" class="space-y-6" style="display: none;">
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+                <h2 class="text-2xl font-bold text-white mb-2">CET Result Sample & Drive Test</h2>
+                <p class="text-xs text-slate-400 mb-6">Hasil pengujian lapangan menggunakan G-NetTrack Pro dan Speedtest per site.</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center">
+                        <div class="bg-slate-900 h-40 rounded-lg mb-4 flex items-center justify-center border border-slate-800">
+                            <span class="text-xs text-slate-400">Site 12JKP0359 Screenshot</span>
+                        </div>
+                        <h3 class="font-bold text-white text-sm">Site 12JKP0359</h3>
+                        <p class="text-xs text-emerald-400 mt-1">Download: 375 Mbps | Upload: 65.3 Mbps</p>
+                    </div>
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center">
+                        <div class="bg-slate-900 h-40 rounded-lg mb-4 flex items-center justify-center border border-slate-800">
+                            <span class="text-xs text-slate-400">Site 12JKP0411 Screenshot</span>
+                        </div>
+                        <h3 class="font-bold text-white text-sm">Site 12JKP0411</h3>
+                        <p class="text-xs text-emerald-400 mt-1">Download: 371 Mbps | Upload: 52.7 Mbps</p>
+                    </div>
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center">
+                        <div class="bg-slate-900 h-40 rounded-lg mb-4 flex items-center justify-center border border-slate-800">
+                            <span class="text-xs text-slate-400">Site 12JKP0456 Screenshot</span>
+                        </div>
+                        <h3 class="font-bold text-white text-sm">Site 12JKP0456</h3>
+                        <p class="text-xs text-emerald-400 mt-1">Download: 371 Mbps | Upload: 52.7 Mbps</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= SLIDE 5: ALARM & TRAFFIC JUSTIFICATION ================= -->
+        <section x-show="activeSlide === 5" class="space-y-6" style="display: none;">
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+                <h2 class="text-2xl font-bold text-white mb-2">Alarm & Traffic Shifting Justification</h2>
+                <p class="text-xs text-slate-400 mb-6">Status pembersihan alarm SIA / Non-SIA serta analisis migrasi trafik antar sektor.</p>
+                
+                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 mb-6">
+                    <h3 class="text-sm font-bold text-white mb-2">Alarm Status Summary</h3>
+                    <p class="text-xs text-slate-300">Semua alarm SIA dan non-SIA telah diselesaikan (Cleared), kecuali site <span class="text-amber-400 font-semibold">12JKP0456 (Door Open - Uncleared)</span> yang sedang dalam pemantauan teknis.</p>
+                </div>
+
+                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
+                    <h3 class="text-sm font-bold text-white mb-2">Traffic Shifting Finding</h3>
+                    <p class="text-xs text-slate-300">Trafik pada site 12JKP0411 sektor 2 & 3 mengalami pergeseran (*shifting*) ke site sekitar, namun secara total akumulasi trafik kluster mengalami peningkatan sebesar <span class="text-emerald-400 font-bold">+12.32%</span>.</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 border-t border-slate-800 py-4 text-center text-xs text-slate-500">
+        &copy; 2026 Indosat Ooredoo Hutchison. Cluster Report Web App Automation.
+    </footer>
+
+    <!-- Leaflet JS untuk Inisialisasi Peta -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        let mapInitialized = false;
+        function initMap() {
+            if (mapInitialized) return;
+            setTimeout(() => {
+                // Koordinat Pusat Jakarta Pusat
+                const map = L.map('clusterMap').setView([-6.1801, 106.8335], 14);
+                
+                // Gunakan Tile CartoDB Dark Matter agar selaras dengan tema web app
+                L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                    maxZoom: 19,
+                    attribution: '&copy; OpenStreetMap & CartoDB'
+                }).addTo(map);
+
+                // Tambahkan Marker Dummy untuk Site Utama Kluster
+                const sites = [
+                    { name: '12JKP0359 (Merdeka Selatan)', lat: -6.1801, lng: 106.8335 },
+                    { name: '12JKP0411 (Kwini)', lat: -6.1840, lng: 106.8420 },
+                    { name: '12JKP0456 (Kramat Pulo)', lat: -6.1920, lng: 106.8480 }
+                ];
+
+                sites.forEach(site => {
+                    L.circleMarker([site.lat, site.lng], {
+                        color: '#10b981',
+                        fillColor: '#10b981',
+                        fillOpacity: 0.8,
+                        radius: 8
+                    }).addTo(map).bindPopup(`<b style="color:#0f172a">${site.name}</b><br><span style="color:#0f172a">Status: Active (RFC)</span>`);
+                });
+
+                mapInitialized = true;
+            }, 200);
+        }
+    </script>
+</body>
+</html>

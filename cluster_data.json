@@ -1,0 +1,37 @@
+{
+  "cluster_name": "JAKARTA PUSAT_01_N04_B",
+  "period": "September - October 2026",
+  "summary": {
+    "total_sites": "3 Sites",
+    "activation_rate": "100%",
+    "traffic_growth": "+16.26%",
+    "dl_throughput": "120.39 Mbps",
+    "ping_pong_ratio": "3.24%"
+  },
+  "sites": [
+    {
+      "du_id": "12JKP0359_5G26_EXP",
+      "site_id": "12JKP0359",
+      "name": "VIP_MERDEKA_SELATAN",
+      "azimuth": "75/160/340",
+      "status": "Active",
+      "onebox_link": "https://onebox.huawei.com/p/6b0a907ecf363f479d0f7e43fb9ed421"
+    },
+    {
+      "du_id": "12JKP0411_5G26_EXP",
+      "site_id": "12JKP0411",
+      "name": "KWINI_BL_FE",
+      "azimuth": "130/280/30",
+      "status": "Active",
+      "onebox_link": "https://onebox.huawei.com/p/6b0a907ecf363f479d0f7e43fb9ed421"
+    },
+    {
+      "du_id": "12JKP0456_5G26_EXP",
+      "site_id": "12JKP0456",
+      "name": "KRAMAT_PULO_EP",
+      "azimuth": "90/200/300",
+      "status": "Active",
+      "onebox_link": "https://onebox.huawei.com/p/6b0a907ecf363f479d0f7e43fb9ed421"
+    }
+  ]
+}
