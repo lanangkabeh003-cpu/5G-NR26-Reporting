@@ -3,8 +3,8 @@
   "period": "September - October 2026",
   "summary": {
     "total_sites": "3 Sites",
-    "activation_rate": "100%",
-    "traffic_growth": "+16.26%",
+    "activation_status": "100% RFC Completed",
+    "total_traffic_growth": "+16.26%",
     "dl_throughput": "120.39 Mbps",
     "ping_pong_ratio": "3.24%"
   },
